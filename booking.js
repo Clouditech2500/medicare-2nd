@@ -1,17 +1,15 @@
-import { Amplify } from 'aws-amplify';
-import { generateClient } from 'aws-amplify/api';
-import { createTodo } from './mutations.js';
-import config from './amplifyconfiguration.json';
-
-// Configure Amplify
-Amplify.configure(config);
-const client = generateClient();
 
 let selectedDoctor = null;
 let selectedTime = null;
 
 // Set minimum date to today
 const today = new Date().toISOString().split('T')[0];
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('appointmentDate');
+    if (dateInput) {
+        dateInput.setAttribute('min', today);
+    }
+});
 
 // Doctor selection
 document.querySelectorAll('.doctor-card').forEach(card => {
@@ -51,7 +49,10 @@ function checkFormCompletion() {
     
     const isComplete = firstName && lastName && email && phone && date && selectedDoctor && selectedTime;
     
-    document.getElementById('bookButton').disabled = !isComplete;
+    const bookButton = document.getElementById('bookButton');
+    if (bookButton) {
+        bookButton.disabled = !isComplete;
+    }
 }
 
 // Add event listeners to form inputs
@@ -59,16 +60,14 @@ document.querySelectorAll('input[required]').forEach(input => {
     input.addEventListener('input', checkFormCompletion);
 });
 
-// Form submission handler for Amplify DynamoDB
+// Form submission handler - Simple version without Amplify
 document.getElementById('bookingForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    console.log('Form submitted - starting to save data...');
+    console.log('Form submitted - processing...');
     
-    // Create appointment data with all fields
+    // Create appointment data
     const formData = {
-        name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
-        description: `Appointment with ${selectedDoctor} at ${selectedTime} on ${document.getElementById('appointmentDate').value}. Email: ${document.getElementById('email').value}, Phone: ${document.getElementById('phone').value}, Reason: ${document.getElementById('reason').value || 'General consultation'}`,
         firstName: document.getElementById('firstName').value,
         lastName: document.getElementById('lastName').value,
         email: document.getElementById('email').value,
@@ -83,15 +82,27 @@ document.getElementById('bookingForm').addEventListener('submit', async function
     console.log('Form data prepared:', formData);
 
     try {
-        const result = await client.graphql({
-            query: createTodo,
-            variables: { input: formData }
-        }); 
-
-        console.log('Appointment saved successfully:', result);
+        // For now, just simulate success since backend isn't connected yet
+        // Later, replace this with actual API call:
+        // const response = await fetch('YOUR_API_ENDPOINT', {
+        //     method: 'POST',
+        //     headers: {'Content-Type': 'application/json'},
+        //     body: JSON.stringify(formData)
+        // });
+        
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        console.log('Appointment data:', formData);
         
         // Show success modal
-        document.getElementById('successModal').style.display = 'block';
+        const modal = document.getElementById('successModal');
+        if (modal) {
+            modal.style.display = 'block';
+        } else {
+            // Fallback if no modal exists
+            alert('Appointment booked successfully!');
+        }
         
         // Reset form
         this.reset();
@@ -101,14 +112,17 @@ document.getElementById('bookingForm').addEventListener('submit', async function
         checkFormCompletion();
         
     } catch (error) {
-        console.error('Error saving appointment:', error);
+        console.error('Error submitting appointment:', error);
         alert('Error submitting appointment. Please try again.');
     }
 });
 
 // Close modal
 function closeModal() {
-    document.getElementById('successModal').style.display = 'none';
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 // Make closeModal available globally
@@ -129,8 +143,11 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // Close modal when clicking outside
-document.getElementById('successModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeModal();
-    }
-});
+const successModal = document.getElementById('successModal');
+if (successModal) {
+    successModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+}
