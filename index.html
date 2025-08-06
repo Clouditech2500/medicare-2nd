@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script type="module" src="booking.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediCare - Book Your Doctor Appointment</title>
@@ -430,22 +429,22 @@
                 <div class="form-group">
                     <label>Select Your Doctor</label>
                     <div class="doctors-grid" id="doctorsGrid">
-                        <div class="doctor-card" data-doctor="dr-smith">
+                        <div class="doctor-card" data-doctor="Dr. Sarah Smith">
                             <div class="doctor-avatar">DS</div>
                             <div class="doctor-name">Dr. Sarah Smith</div>
                             <div class="doctor-specialty">Cardiologist</div>
                         </div>
-                        <div class="doctor-card" data-doctor="dr-johnson">
+                        <div class="doctor-card" data-doctor="Dr. Michael Johnson">
                             <div class="doctor-avatar">MJ</div>
                             <div class="doctor-name">Dr. Michael Johnson</div>
                             <div class="doctor-specialty">Neurologist</div>
                         </div>
-                        <div class="doctor-card" data-doctor="dr-williams">
+                        <div class="doctor-card" data-doctor="Dr. Emily Williams">
                             <div class="doctor-avatar">EW</div>
                             <div class="doctor-name">Dr. Emily Williams</div>
                             <div class="doctor-specialty">Pediatrician</div>
                         </div>
-                        <div class="doctor-card" data-doctor="dr-brown">
+                        <div class="doctor-card" data-doctor="Dr. David Brown">
                             <div class="doctor-avatar">DB</div>
                             <div class="doctor-name">Dr. David Brown</div>
                             <div class="doctor-specialty">Orthopedist</div>
@@ -456,12 +455,12 @@
                 <div class="form-group">
                     <label>Available Time Slots</label>
                     <div class="time-slots" id="timeSlots">
-                        <div class="time-slot" data-time="09:00">9:00 AM</div>
-                        <div class="time-slot" data-time="10:00">10:00 AM</div>
-                        <div class="time-slot" data-time="11:00">11:00 AM</div>
-                        <div class="time-slot" data-time="14:00">2:00 PM</div>
-                        <div class="time-slot" data-time="15:00">3:00 PM</div>
-                        <div class="time-slot" data-time="16:00">4:00 PM</div>
+                        <div class="time-slot" data-time="09:00 AM">9:00 AM</div>
+                        <div class="time-slot" data-time="10:00 AM">10:00 AM</div>
+                        <div class="time-slot" data-time="11:00 AM">11:00 AM</div>
+                        <div class="time-slot" data-time="02:00 PM">2:00 PM</div>
+                        <div class="time-slot" data-time="03:00 PM">3:00 PM</div>
+                        <div class="time-slot" data-time="04:00 PM">4:00 PM</div>
                     </div>
                 </div>
 
@@ -485,6 +484,8 @@
     </div>
 
     <script>
+        // API endpoint - add your API Gateway URL here when ready
+        // const API_ENDPOINT = 'https://your-api-gateway-url.amazonaws.com/prod/appointments';
 
         let selectedDoctor = null;
         let selectedTime = null;
@@ -540,10 +541,52 @@
         });
 
         // Form submission
-        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Show success modal
+            // Collect form data
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                appointmentDate: document.getElementById('appointmentDate').value,
+                appointmentTime: selectedTime,
+                doctor: selectedDoctor,
+                reason: document.getElementById('reason').value || 'General consultation',
+                bookedAt: new Date().toISOString()
+            };
+            
+            console.log('Appointment data:', formData);
+            
+            // TODO: When your API is ready, uncomment this section:
+            /*
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const result = await response.json();
+                console.log('Success:', result);
+                
+                // Show success modal
+                document.getElementById('successModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to book appointment. Please try again.');
+                return;
+            }
+            */
+            
+            // For now, just show success modal (remove this when API is connected)
             document.getElementById('successModal').style.display = 'block';
             
             // Reset form
@@ -579,8 +622,6 @@
                 closeModal();
             }
         });
-        
     </script>
-    <script src="booking.js"></script>
 </body>
 </html>
